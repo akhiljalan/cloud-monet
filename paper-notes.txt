@@ -1,0 +1,13 @@
+Notes on Eventual Paper: 
+
+- For citations, look at the "doc" folder 
+
+PAPERS
+In "Neural Style Transfer - A Review" there are hella resources for other citations
+--> In section 9, there is a discussion of applications to ML research
+--> In section 7, a discussion of industrial applications
+--> Citations 19, 20 have to do with image reconstruction
+
+In "Fast Patch-based Style Transfer of Arbitrary Style"
+
+CycleGAN
