@@ -22,20 +22,23 @@ def load_xy_pair(fake_directory, real_directory, prob_of_real = 0.5):
     coin_flip = np.random.binomial(1, prob_of_real)
     fake_img_names = os.listdir(fake_directory)
     real_img_names = os.listdir(real_directory)
+    name = ''
     if coin_flip == 1: 
         # pick real 
         index = np.random.randint(low=0, high=len(real_img_names))
-        img_path = real_directory + real_img_names[index]
+        name = real_img_names[index]
+        img_path = real_directory + name
         y = tf.constant([[1.0, 0.0]])
     else: 
         # pick fake
         index = np.random.randint(low=0, high=len(fake_img_names))
-        img_path = fake_directory + fake_img_names[index]
+        name = fake_img_names[index]
+        img_path = fake_directory + name
         y = tf.constant([[0.0, 1.0]])
     img = load_image(img_path, image_size=256)
-    return img, y
+    return img, y, name
         
-def load_xy_pairs(fake_directory, real_directory, batch_size = 4): 
+def load_xy_pairs(fake_directory, real_directory, batch_size = 4, prob_of_real = 0.5): 
     '''
     Loads a batch of tensor pairs (x, y) that are the x (input) and y (label) to the 
     discriminator network. Randomly picks a "fake" or "real" image each time. 
@@ -52,9 +55,11 @@ def load_xy_pairs(fake_directory, real_directory, batch_size = 4):
     '''
     fake_img_names = os.listdir(fake_directory)
     real_img_names = os.listdir(real_directory)
-    images, labels = load_xy_pair(fake_directory, real_directory)
+    images, labels, first_img_path = load_xy_pair(fake_directory, real_directory, prob_of_real)
+    img_paths = [first_img_path]
     for i in range(batch_size - 1): 
-        new_img, new_label = load_xy_pair(fake_directory, real_directory)
+        new_img, new_label, img_path = load_xy_pair(fake_directory, real_directory, prob_of_real)
         images = tf.concat([images, new_img], axis = 0)
         labels = tf.concat([labels, new_label], axis = 0)
-    return images, labels
+        img_paths.append(img_path)
+    return images, labels, img_paths
