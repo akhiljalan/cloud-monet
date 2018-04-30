@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
 
-slim = tf.contrib
+slim = tf.contrib.slim
 import sys
 import os
 import numpy as np
