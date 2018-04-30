@@ -64,3 +64,9 @@ def load_xy_pairs(fake_directory, real_directory, batch_size = 4, prob_of_real =
         labels = tf.concat([labels, new_label], axis = 0)
         img_paths.append(img_path)
     return images, labels, img_paths
+
+def gen_labels(is_real = True, batch_size = 4): 
+    if is_real: 
+        return tf.constant(np.repeat(np.array([[1.0, 0.0]]), batch_size, axis=0))
+    else: 
+        return tf.constant(np.repeat(np.array([[0.0, 1.0]]), batch_size, axis=0))

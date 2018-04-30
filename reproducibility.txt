@@ -1,7 +1,8 @@
-COCO: 2017 Validation Dataset
+COCO:  (2017 Test Images)
 http://cocodataset.org/#download
 
-Painters by Numbers: Train Folder 1 
+
+Painters by Numbers: Train Folder 1 (train_1.zip)
 
 Describable Textures Dataset:
 https://www.robots.ox.ac.uk/~vgg/data/dtd/
