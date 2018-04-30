@@ -1,9 +1,9 @@
 import sys
 import os
 import numpy as np
-sys.path.append('../../magenta/magenta/models/arbitrary_image_stylization/')
-sys.path.append('../../magenta/magenta/models/image_stylization/')
-sys.path.append('../image_stylization/')
+# sys.path.append('../../magenta/magenta/models/arbitrary_image_stylization/')
+# sys.path.append('../../magenta/magenta/models/image_stylization/')
+# sys.path.append('../image_stylization/')
 from image_utils import *
 
 def load_xy_pair(fake_directory, real_directory, prob_of_real = 0.5): 
@@ -54,6 +54,7 @@ def load_xy_pairs(fake_directory, real_directory, batch_size = 4, prob_of_real =
     images: A tensor of shape [batch_size, ?, ?, 3]
     labels: A tensor of shape [batch_size, 2]. 
     '''
+    print("loading images")
     fake_img_names = os.listdir(fake_directory)
     real_img_names = os.listdir(real_directory)
     images, labels, first_img_path = load_xy_pair(fake_directory, real_directory, prob_of_real)
