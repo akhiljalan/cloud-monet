@@ -11,8 +11,9 @@ from magenta.models.image_stylization import vgg
 from data_processing_utils import * 
 from arbitrary_image_stylization_losses import * 
 
-# Imports for the model build (forward pass). 
-from magenta.models.arbitrary_image_stylization import nza_model as transformer_model
+# Causes import error. Maybe import th
+# Below causes import error, 'no module named arbitrary_image_stylization'. Maybe import the py file directly. 
+from magenta.models.arbitrary_image_stylization import nza_model as transformer_model 
 from magenta.models.image_stylization import ops
 from tensorflow.contrib.slim.python.slim.nets import inception_v3
 
@@ -231,7 +232,8 @@ class GAN_model(object):
 
 
 			# TODO make content, style batch
-			content_batch, style_batch = None, None
+			content_batch = data_processing_utils.load_random_images(content_path, batch_size = self.batch_size)
+			style_batch = data_processing_utils.load_random_images(style_path, batch_size = self.batch_size)
 
 			# Compute two forward passes of the generator. 
 			stylized_images = stylize_images(content_batch, style_batch)
