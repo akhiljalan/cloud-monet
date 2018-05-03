@@ -11,6 +11,10 @@ from magenta.models.image_stylization import vgg
 from data_processing_utils import * 
 from arbitrary_image_stylization_losses import * 
 
+# Imports for the model build (forward pass). 
+from magenta.models.arbitrary_image_stylization import nza_model as transformer_model
+from magenta.models.image_stylization import ops
+from tensorflow.contrib.slim.python.slim.nets import inception_v3
 
 class GAN_model(object):
 	"""
@@ -53,10 +57,49 @@ class GAN_model(object):
 
 		# return self.random_z
 	
-	def stylize_images(content_input, style_input):
+	def stylize_images(content_input, style_input, trainable, is_training, reuse=None, 
+		inception_end_point='Mixed_6e', style_prediction_bottleneck=100, adds_losses=True, 
+		content_weights=None, style_weights=None, total_variation_weight=None):
 		'''
 		See build_model.
 		'''
+		# def build_model(content_input_,
+		  #               style_input_,
+		  #               trainable,
+		  #               is_training,
+		  #               reuse=None,
+		  #               inception_end_point='Mixed_6e',
+		  #               style_prediction_bottleneck=100,
+		  #               adds_losses=True,
+		  #               content_weights=None,
+		  #               style_weights=None,
+		  #               total_variation_weight=None):
+
+  		# Call style_transfer_losses to get all the different losses! 
+  		[activation_names,
+		   activation_depths] = transformer_model.style_normalization_activations()
+
+		  # Defines the style prediction network.
+		  # From the build_model file import style_prediction
+		style_params, bottleneck_feat = style_prediction(
+		  style_input_,
+		  activation_names,
+		  activation_depths,
+		  is_training=is_training,
+		  trainable=trainable,
+		  inception_end_point=inception_end_point,
+		  style_prediction_bottleneck=style_prediction_bottleneck,
+		  reuse=reuse)
+
+		# Defines the style transformer network.
+		stylized_images = transformer_model.transform(
+		  content_input_,
+		  normalizer_fn=ops.conditional_style_norm,
+		  reuse=reuse,
+		  trainable=trainable,
+		  is_training=is_training,
+		  normalizer_params={'style_params': style_params})
+
 		return None 
 
   
@@ -244,6 +287,45 @@ class GAN_model(object):
 			tf.summary.scalar('losses/loss_Discriminator', self.loss_Discriminator)
 			tf.summary.scalar('losses/loss_Generator', self.loss_Generator)
 			
+
+			#TODO 
+
+			# Set up training
+			optimizer = tf.train.AdamOptimizer(FLAGS.learning_rate)
+			train_op = slim.learning.create_train_op(
+			  total_loss,
+			  optimizer,
+			  clip_gradient_norm=FLAGS.clip_gradient_norm,
+			  summarize_gradients=True) #False? 
+
+			# Function to restore VGG16 parameters.
+			init_fn_vgg = slim.assign_from_checkpoint_fn(vgg.checkpoint_file(),
+			                                           slim.get_variables('vgg_16'))
+
+			# Function to restore Inception_v3 parameters.
+			inception_variables_dict = {
+			  var.op.name: var
+			  for var in slim.get_model_variables('InceptionV3')
+			}
+			init_fn_inception = slim.assign_from_checkpoint_fn(
+			  FLAGS.inception_v3_checkpoint, inception_variables_dict)
+
+			# Function to restore VGG16 and Inception_v3 parameters.
+			def init_sub_networks(session):
+				init_fn_vgg(session)
+				init_fn_inception(session)
+
+			# Run training
+			# slim.learning.train(
+			#   train_op=train_op,
+			#   logdir=os.path.expanduser(FLAGS.train_dir),
+			#   master=FLAGS.master,
+			#   is_chief=FLAGS.task == 0,
+			#   number_of_steps=FLAGS.train_steps,
+			#   init_fn=init_sub_networks,
+			#   save_summaries_secs=FLAGS.save_summaries_secs,
+			#   save_interval_secs=FLAGS.save_interval_secs)
+
 			# Add histogram summaries
 			# for var in self.D_vars:
 			# 	tf.summary.histogram(var.op.name, var)
