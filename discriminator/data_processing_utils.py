@@ -65,6 +65,22 @@ def load_xy_pairs(fake_directory, real_directory, batch_size = 4, prob_of_real =
         img_paths.append(img_path)
     return images, labels, img_paths
 
+def load_random_images(filepath, batch_size = 4): 
+    img_names = os.listdir(filepath)
+
+    # Create a set of random indices from [0, ..., len(img_names) - 1]
+    indices = np.random.choice(np.arange(len(img_names)), batch_size, replace=False)
+
+    # Load a single random image. 
+    images = load_image(filepath + img_names[indices[0]], image_size=256)
+
+    # Load the rest of the images, concatenating onto the images tensor. 
+    for i in range(1, len(indices)): 
+        index = indices[i]
+        next_img = load_image(filepath + img_names[index], image_size=256)
+        images = tf.concat([images, next_img], axis=0)
+    return images
+
 def gen_labels(is_real = True, batch_size = 4): 
     if is_real: 
         return tf.constant(np.repeat(np.array([[1.0, 0.0]]), batch_size, axis=0))
