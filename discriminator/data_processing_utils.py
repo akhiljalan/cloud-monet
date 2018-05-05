@@ -1,8 +1,7 @@
 import sys
 import os
 import numpy as np
-sys.path.append('../../magenta/magenta/models/arbitrary_image_stylization/')
-sys.path.append('../../magenta/magenta/models/image_stylization/')
+sys.path.append('../arbitrary_image_stylization/')
 sys.path.append('../image_stylization/')
 from image_utils import *
 
