@@ -5,7 +5,7 @@ import tensorflow as tf
 
 sys.path.append('../arbitrary_image_stylization(modified)/')
 sys.path.append('../discriminator/')
-sys.path.append('../image_stylization')
+sys.path.append('../image_stylization/')
 import arbitrary_image_stylization_build_model as build_model
 from data_processing_utils import *
 
@@ -23,7 +23,11 @@ def discriminator_network(images, reuse_val=tf.AUTO_REUSE, is_training=True):
 def main():
 	tf.reset_default_graph()
 	BATCH_SIZE = 1
+	tf.set_random_seed(194)
+	np.seed(129)
+	
 	with tf.Graph().as_default(), tf.Session() as sess:
+
 		# Loads content images.
 
 		#TODO load test images from a different test path. Do a small amount for simplicity
@@ -119,6 +123,8 @@ def main():
 		gen_var_names = [var for var in model_vars if 'discriminator' not in var.name]
 
 		gen_assign_op, gen_feed_dict = slim.assign_from_checkpoint(gen_checkpoint, gen_var_names) #TODO change this...
+
+		# TODO: Add logic for initializing the discriminator from scratch. 
 		# discrim_assign_op, discrim_feed_dict = slim.assign_from_checkpoint(discrim_checkpoint,
 		#                                            discrim_var_names)
 		
