@@ -8,6 +8,12 @@ This is still a work in progress. We'll give detailed instructions about how to 
 
 ## Reproducibility
 
+### Python Environment
+
+We used the Magenta environment created by Google. If you're using Python 2.7 and Tensorflow 1.7, you should be able to run our code. But for full reproducibility, we suggest using their environment, which you can install from the instructions at: https://github.com/tensorflow/magenta#installation
+
+### Datasets
+
 COCO:  (2017 Test Images)
 http://cocodataset.org/#download
 
