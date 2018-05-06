@@ -3,11 +3,11 @@ import os
 import numpy as np
 import tensorflow as tf
 
-sys.path.append('./arbitrary_image_stylization(modified)/')
-sys.path.append('./discriminator/')
-sys.path.append('./image_stylization')
+sys.path.append('../arbitrary_image_stylization(modified)/')
+sys.path.insert(0, '../discriminator/')
+sys.path.append('../image_stylization/')
 import arbitrary_image_stylization_build_model as build_model
-from data_processing_utils import *
+from data_processing_utils import * 
 
 def discriminator_network(images, reuse_val=tf.AUTO_REUSE, is_training=True): 
 	with tf.variable_scope(tf.get_variable_scope(), reuse=reuse_val) and tf.name_scope('discriminator'):
@@ -28,6 +28,11 @@ def main():
 
 		#TODO load test images from a different test path. Do a small amount for simplicity
 		# Make sure it's the same content, style images as the test set for the GAN 
+		test_content_path = '../testset/content/'
+		test_style_path = '../testset/style/'
+
+		content_path = '../../magenta/data/coco0/'
+		style_path = '../../magenta/data/painter/painter0/'
 
 		# todo insert content_path, style_path... 
 		content_inputs_ = load_random_images(content_path, batch_size=BATCH_SIZE)
@@ -45,6 +50,7 @@ def main():
 		stylized_images, total_loss_pass_1, loss_dict_pass_1, _ = build_model.build_model(
 			content_inputs_,
 			style_inputs_,
+			reuse=tf.AUTO_REUSE,
 			trainable=True,
 			is_training=True,
 			inception_end_point='Mixed_6e',
@@ -53,19 +59,21 @@ def main():
 			content_weights=content_weights,
 			style_weights=style_weights,
 			total_variation_weight=total_variation_weight)
+
+		unstylized_images, total_loss_pass_2, loss_dict_pass_2 = None, 0.0, {}
 		
-		unstylized_images, total_loss_pass_2, loss_dict_pass_2, _ = build_model.build_model(
-			stylized_images, #stylized as content
-			content_inputs_, #original content as style
-			reuse=True,
-			trainable=True,
-			is_training=True,
-			inception_end_point='Mixed_6e',
-			style_prediction_bottleneck=100,
-			adds_losses=True,
-			content_weights=content_weights,
-			style_weights=style_weights,
-			total_variation_weight=total_variation_weight)
+		# unstylized_images, total_loss_pass_2, loss_dict_pass_2, _ = build_model.build_model(
+		# 	stylized_images, #stylized as content
+		# 	content_inputs_, #original content as style
+		# 	reuse=True,
+		# 	trainable=True,
+		# 	is_training=True,
+		# 	inception_end_point='Mixed_6e',
+		# 	style_prediction_bottleneck=100,
+		# 	adds_losses=True,
+		# 	content_weights=content_weights,
+		# 	style_weights=style_weights,
+		# 	total_variation_weight=total_variation_weight)
 		
 		# Log all losses to tensorboard. 
 		loss_dict = {}
@@ -79,7 +87,7 @@ def main():
 			# tf.summary.image('image/1_style_inputs_orig', style_inputs_orig_, 3)
 		tf.summary.image('image/1_style_inputs', style_inputs_, 3)
 		tf.summary.image('image/2_stylized_images', stylized_images, 3)
-		tf.summary.image('image/3_unstylized_images', unstylized_images, 3)
+		# tf.summary.image('image/3_unstylized_images', unstylized_images, 3)
 				
 				
 
@@ -88,13 +96,13 @@ def main():
 		# def gen_labels(is_real = True, batch_size = 4): 
 
 		# Generate label tensors on the fly. 
-		discrim_loss = slim.losses.softmax_cross_entropy(discrim_predictions, gen_labels(is_real=False, batch_size=BATCH_SIZE))
-		gen_fooling_loss = slim.losses.softmax_cross_entropy(discrim_predictions, gen_labels(is_real=True, batch_size=BATCH_SIZE))
+		discrim_loss = slim.losses.softmax_cross_entropy(discrim_predictions, gen_labels(is_real=True, batch_size=BATCH_SIZE))
+		# gen_fooling_loss = slim.losses.softmax_cross_entropy(discrim_predictions, gen_labels(is_real=True, batch_size=BATCH_SIZE))
 		
 				
 		gen_optimizer = tf.train.AdamOptimizer(learning_rate=1e-2)
 		gen_train_op = slim.learning.create_train_op(
-			total_loss_pass_1 + total_variation_weight * gen_fooling_loss, # + total_loss_pass_2? 
+			total_loss_pass_1, #+ total_variation_weight * gen_fooling_loss, # + total_loss_pass_2? 
 			gen_optimizer,
 			summarize_gradients=True)
 
@@ -104,33 +112,44 @@ def main():
 			discr_optimizer,
 			summarize_gradients=True)		
 		
-		# todo merge train ops 
+		# todo merge train ops
+
 
 		# Get checkpoint files. 
 		# See above for the inception, vgg checkpoints. 
 		
 		# TODO change checkpoint path...
-		gen_checkpoint = '/Users/akhiljalan/Documents/arbitrary_style_transfer/model.ckpt'
-		discrim_checkpoint = './logdir/model.ckpt-85'
+		gen_checkpoint = '../../magenta/arbitrary_style_transfer/model.ckpt'
+		# discrim_checkpoint = './logdir/model.ckpt-85'
 		
 		model_vars = slim.get_variables_to_restore()
 		# No saved model yet! 
-		discrim_var_names = [var for var in model_vars if 'discriminator' in var.name]
+		# discrim_var_names = [var for var in model_vars if 'discriminator' in var.name]
 		gen_var_names = [var for var in model_vars if 'discriminator' not in var.name]
+		# gen_var_names = model_vars #
+		# print(gen_var_names)
 
-		gen_assign_op, gen_feed_dict = slim.assign_from_checkpoint(gen_checkpoint, gen_var_names) #TODO change this...
+
+		# gen_assign_op, gen_feed_dict = slim.assign_from_checkpoint(gen_checkpoint, gen_var_names) #TODO change this...
 		# discrim_assign_op, discrim_feed_dict = slim.assign_from_checkpoint(discrim_checkpoint,
 		#                                            discrim_var_names)
+
+		init_fn = slim.assign_from_checkpoint_fn(gen_checkpoint,
+                                               slim.get_variables_to_restore())
 		
 
 		def init_assign_func(sess):
-			sess.run(gen_assign_op, gen_feed_dict)				
+			# sess.run(gen_assign_op, gen_feed_dict)
+			init_fn(sess)	#			
 
 		
 		slim.learning.train(
-			train_op=train_op, #todo replace with merged train op. 
+			train_op=gen_train_op, #todo replace with merged train op. 
 			logdir='./logdir2/',
 			number_of_steps=1,
 			init_fn=init_assign_func,
 			save_summaries_secs=1,
 			save_interval_secs=1)
+
+if __name__ == '__main__':
+  main()
