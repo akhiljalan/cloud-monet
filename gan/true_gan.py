@@ -2,12 +2,15 @@ import sys
 import os
 import numpy as np
 import tensorflow as tf
+slim = tf.contrib.slim
 
-sys.path.append('../arbitrary_image_stylization(modified)/')
-sys.path.insert(0, '../discriminator/')
-sys.path.append('../image_stylization/')
+# sys.path.append('discriminator/')
+sys.path.append('image_stylization/')
+sys.path.insert(0, 'arbitrary_image_stylization_modified/')
+# sys.path.append('../')
 import arbitrary_image_stylization_build_model as build_model
-from data_processing_utils import * 
+# import data_processing_utils
+from discriminator.data_processing_utils import load_random_images
 
 def discriminator_network(images, reuse_val=tf.AUTO_REUSE, is_training=True): 
 	with tf.variable_scope(tf.get_variable_scope(), reuse=reuse_val) and tf.name_scope('discriminator'):
@@ -31,8 +34,8 @@ def main():
 		test_content_path = '../testset/content/'
 		test_style_path = '../testset/style/'
 
-		content_path = '../../magenta/data/coco0/'
-		style_path = '../../magenta/data/painter/painter0/'
+		content_path = '/home/noah/magenta/data/coco0/'#magenta/data/coco0'
+		style_path = '/home/noah/magenta/data/painter/painter0/'
 
 		# todo insert content_path, style_path... 
 		content_inputs_ = load_random_images(content_path, batch_size=BATCH_SIZE)
@@ -93,7 +96,9 @@ def main():
 
 		discrim_predictions = discriminator_network(content_inputs_)
 
-		# def gen_labels(is_real = True, batch_size = 4): 
+		def gen_labels(is_real = True, batch_size = 4): 
+			#TODO: IMPLEMENT
+			return None
 
 		# Generate label tensors on the fly. 
 		discrim_loss = slim.losses.softmax_cross_entropy(discrim_predictions, gen_labels(is_real=True, batch_size=BATCH_SIZE))
@@ -135,7 +140,7 @@ def main():
 		#                                            discrim_var_names)
 
 		init_fn = slim.assign_from_checkpoint_fn(gen_checkpoint,
-                                               slim.get_variables_to_restore())
+                                               gen_var_names)
 		
 
 		def init_assign_func(sess):
