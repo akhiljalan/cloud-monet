@@ -18,7 +18,8 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
-sys.path.append('../')
+import sys 
+# sys.path.append('../')
 import arbitrary_image_stylization_losses as losses
 import nza_model as transformer_model
 from magenta.models.image_stylization import ops

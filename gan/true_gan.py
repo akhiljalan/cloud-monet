@@ -38,17 +38,21 @@ def main():
 		#TODO load test images from a different test path. Do a small amount for simplicity
 		# Make sure it's the same content, style images as the test set for the GAN 
 
+		# TODO check the path here. 
 		test_content_path = '../testset/content/'
 		test_style_path = '../testset/style/'
 
+		# TODO Fix paths? 
 		content_path = '/home/noah/magenta/data/coco0/'#magenta/data/coco0'
 		style_path = '/home/noah/magenta/data/painter/painter0/'
 
+		akhil_dummy_path = '/Users/akhiljalan/Documents/trainingdata_stylized_500/stylized500/'
+
 		# todo insert content_path, style_path... 
-		content_inputs_ = data_utils_all.load_random_images(content_path, batch_size=BATCH_SIZE)
+		content_inputs_ = data_utils_all.load_random_images(akhil_dummy_path, batch_size=BATCH_SIZE)
 		
 		# Loads evaluation style images.
-		style_inputs_ = data_utils_all.load_random_images(style_path, batch_size=BATCH_SIZE)
+		style_inputs_ = data_utils_all.load_random_images(akhil_dummy_path, batch_size=BATCH_SIZE)
 		
 		# Default style, content, and variation weights from magenta. 
 		
@@ -99,17 +103,16 @@ def main():
 		tf.summary.image('image/2_stylized_images', stylized_images, 3)
 		# tf.summary.image('image/3_unstylized_images', unstylized_images, 3)
 				
-				
 
 		discrim_predictions = discriminator_network(content_inputs_)
 
-		def gen_labels(is_real = True, batch_size = 4): 
-			#TODO: IMPLEMENT
-			return None
-
+		
 		# Generate label tensors on the fly. 
-		discrim_loss = slim.losses.softmax_cross_entropy(discrim_predictions, gen_labels(is_real=True, batch_size=BATCH_SIZE))
-		# gen_fooling_loss = slim.losses.softmax_cross_entropy(discrim_predictions, gen_labels(is_real=True, batch_size=BATCH_SIZE))
+
+		real_labels = data_utils_all.gen_labels(is_real=True, batch_size=BATCH_SIZE)
+		fake_labels = data_utils_all.gen_labels(is_real=False, batch_size=BATCH_SIZE)
+		discrim_loss = slim.losses.softmax_cross_entropy(discrim_predictions, real_labels)
+		# gen_fooling_loss = slim.losses.softmax_cross_entropy(discrim_predictions, fake_labels)
 		
 				
 		gen_optimizer = tf.train.AdamOptimizer(learning_rate=1e-2)
