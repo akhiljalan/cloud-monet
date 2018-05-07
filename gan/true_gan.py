@@ -11,8 +11,14 @@ sys.path.insert(0, 'arbitrary_image_stylization_modified/')
 import arbitrary_image_stylization_build_model as build_model
 # import data_processing_utils
 from discriminator.data_processing_utils import load_random_images
+import data_utils_all
 
 def discriminator_network(images, reuse_val=tf.AUTO_REUSE, is_training=True): 
+	'''
+	Simple discriminator network. Reads image batch of size [Batch, 256, 256, 3]
+	Outputs labels of size [Batch, 2]
+	Representing probability of real/fake 
+	'''
 	with tf.variable_scope(tf.get_variable_scope(), reuse=reuse_val) and tf.name_scope('discriminator'):
 		conv1_out = slim.conv2d(images, 1, [5, 5], activation_fn=tf.nn.relu, scope='discriminator/conv1')
 		pool1_out = slim.max_pool2d(conv1_out, [2, 2], stride=2, scope='discriminator/pool1')
@@ -31,6 +37,7 @@ def main():
 
 		#TODO load test images from a different test path. Do a small amount for simplicity
 		# Make sure it's the same content, style images as the test set for the GAN 
+
 		test_content_path = '../testset/content/'
 		test_style_path = '../testset/style/'
 
@@ -38,10 +45,10 @@ def main():
 		style_path = '/home/noah/magenta/data/painter/painter0/'
 
 		# todo insert content_path, style_path... 
-		content_inputs_ = load_random_images(content_path, batch_size=BATCH_SIZE)
+		content_inputs_ = data_utils_all.load_random_images(content_path, batch_size=BATCH_SIZE)
 		
 		# Loads evaluation style images.
-		style_inputs_ = load_random_images(style_path, batch_size=BATCH_SIZE)
+		style_inputs_ = data_utils_all.load_random_images(style_path, batch_size=BATCH_SIZE)
 		
 		# Default style, content, and variation weights from magenta. 
 		
