@@ -6,7 +6,7 @@ slim = tf.contrib.slim
 
 # sys.path.append('discriminator/')
 sys.path.append('image_stylization/')
-sys.path.insert(0, 'arbitrary_image_stylization_modified/')
+sys.path.append('arbitrary_image_stylization_modified/')
 # sys.path.append('../')
 import arbitrary_image_stylization_build_model as build_model
 # import data_processing_utils
@@ -33,6 +33,7 @@ def main():
 	tf.reset_default_graph()
 	BATCH_SIZE = 1
 	with tf.Graph().as_default(), tf.Session() as sess:
+		# train.MonitoredTraining
 		# Loads content images.
 
 		#TODO load test images from a different test path. Do a small amount for simplicity
@@ -45,14 +46,16 @@ def main():
 		# TODO Fix paths? 
 		content_path = '/home/noah/magenta/data/coco0/'#magenta/data/coco0'
 		style_path = '/home/noah/magenta/data/painter/painter0/'
+		content_inputs_ = data_utils_all.load_random_images(content_path, batch_size=BATCH_SIZE)
+		style_inputs_ = data_utils_all.load_random_images(style_path, batch_size=BATCH_SIZE)
 
-		akhil_dummy_path = '/Users/akhiljalan/Documents/trainingdata_stylized_500/stylized500/'
+		# akhil_dummy_path = '/Users/akhiljalan/Documents/trainingdata_stylized_500/stylized500/'
 
 		# todo insert content_path, style_path... 
-		content_inputs_ = data_utils_all.load_random_images(akhil_dummy_path, batch_size=BATCH_SIZE)
+		# content_inputs_ = data_utils_all.load_random_images(akhil_dummy_path, batch_size=BATCH_SIZE)
 		
 		# Loads evaluation style images.
-		style_inputs_ = data_utils_all.load_random_images(akhil_dummy_path, batch_size=BATCH_SIZE)
+		# style_inputs_ = data_utils_all.load_random_images(akhil_dummy_path, batch_size=BATCH_SIZE)
 		
 		# Default style, content, and variation weights from magenta. 
 		
@@ -104,14 +107,14 @@ def main():
 		# tf.summary.image('image/3_unstylized_images', unstylized_images, 3)
 				
 
-		discrim_predictions = discriminator_network(content_inputs_)
+		# discrim_predictions = discriminator_network(content_inputs_)
 
 		
 		# Generate label tensors on the fly. 
 
 		real_labels = data_utils_all.gen_labels(is_real=True, batch_size=BATCH_SIZE)
 		fake_labels = data_utils_all.gen_labels(is_real=False, batch_size=BATCH_SIZE)
-		discrim_loss = slim.losses.softmax_cross_entropy(discrim_predictions, real_labels)
+		# discrim_loss = slim.losses.softmax_cross_entropy(discrim_predictions, real_labels)
 		# gen_fooling_loss = slim.losses.softmax_cross_entropy(discrim_predictions, fake_labels)
 		
 				
@@ -119,13 +122,13 @@ def main():
 		gen_train_op = slim.learning.create_train_op(
 			total_loss_pass_1, #+ total_variation_weight * gen_fooling_loss, # + total_loss_pass_2? 
 			gen_optimizer,
-			summarize_gradients=True)
+			summarize_gradients=False)
 
-		discr_optimizer = tf.train.AdamOptimizer(learning_rate=1e-2)
-		discr_train_op = slim.learning.create_train_op(
-			discrim_loss, # + total_loss_pass_2? 
-			discr_optimizer,
-			summarize_gradients=True)		
+		# discr_optimizer = tf.train.AdamOptimizer(learning_rate=1e-2)
+		# discr_train_op = slim.learning.create_train_op(
+		# 	discrim_loss, # + total_loss_pass_2? 
+		# 	discr_optimizer,
+		# 	summarize_gradients=True)		
 		
 		# todo merge train ops
 
@@ -134,14 +137,16 @@ def main():
 		# See above for the inception, vgg checkpoints. 
 		
 		# TODO change checkpoint path...
-		gen_checkpoint = '../../magenta/arbitrary_style_transfer/model.ckpt'
+		gen_checkpoint = '/home/noah/magenta/arbitrary_style_transfer/model.ckpt'
+		# gen_checkpoint = '../../magenta/arbitrary_style_transfer/model.ckpt'
 		# discrim_checkpoint = './logdir/model.ckpt-85'
 		
 		model_vars = slim.get_variables_to_restore()
 		# No saved model yet! 
 		# discrim_var_names = [var for var in model_vars if 'discriminator' in var.name]
-		gen_var_names = [var for var in model_vars if 'discriminator' not in var.name]
-		# gen_var_names = model_vars #
+		# gen_var_names = [var for var in model_vars if 'beta' not in var.name]
+		# gen_var_names = [var for var in model_vars if var.shape == ()]
+		gen_var_names = model_vars #
 		# print(gen_var_names)
 
 
@@ -149,8 +154,8 @@ def main():
 		# discrim_assign_op, discrim_feed_dict = slim.assign_from_checkpoint(discrim_checkpoint,
 		#                                            discrim_var_names)
 
-		init_fn = slim.assign_from_checkpoint_fn(gen_checkpoint,
-                                               gen_var_names)
+		init_fn = slim.assign_from_checkpoint_fn(gen_checkpoint, gen_var_names)
+
 		
 
 		def init_assign_func(sess):
@@ -160,11 +165,12 @@ def main():
 		
 		slim.learning.train(
 			train_op=gen_train_op, #todo replace with merged train op. 
-			logdir='./logdir2/',
-			number_of_steps=1,
-			init_fn=init_assign_func,
+			logdir='./logdir01/',
+			number_of_steps=2,
 			save_summaries_secs=1,
-			save_interval_secs=1)
+			save_interval_secs=1,
+			init_fn=init_assign_func)
 
+		# init_fn=init_assign_func,
 if __name__ == '__main__':
   main()
