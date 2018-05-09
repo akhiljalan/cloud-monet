@@ -19,10 +19,9 @@ from __future__ import print_function
 
 import tensorflow as tf
 import sys 
-# sys.path.append('../')
 import arbitrary_image_stylization_losses as losses
 import nza_model as transformer_model
-from image_stylization import ops
+import ops
 from tensorflow.contrib.slim.python.slim.nets import inception_v3
 
 

@@ -22,8 +22,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
-
-from image_stylization import model as model_util
+import model as model_util
 
 slim = tf.contrib.slim
 

@@ -21,7 +21,7 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
-from image_stylization import vgg
+import vgg
 
 slim = tf.contrib.slim
 

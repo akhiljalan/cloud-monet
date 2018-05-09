@@ -19,8 +19,7 @@ from __future__ import print_function
 
 
 import tensorflow as tf
-
-from image_stylization import ops
+import ops
 
 slim = tf.contrib.slim
 

@@ -166,7 +166,7 @@ def main():
 		slim.learning.train(
 			train_op=gen_train_op, #todo replace with merged train op. 
 			logdir='./logdir01/',
-			number_of_steps=6500000,
+			number_of_steps=2,
 			save_summaries_secs=1,
 			save_interval_secs=1,
 			init_fn=init_assign_func)

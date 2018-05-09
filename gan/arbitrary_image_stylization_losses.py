@@ -20,8 +20,8 @@ from __future__ import print_function
 import numpy as np
 import tensorflow as tf
 
-from image_stylization import learning as learning_utils
-from image_stylization import vgg
+import learning as learning_utils
+import vgg
 
 
 def total_loss(content_inputs, style_inputs, stylized_inputs, content_weights,
