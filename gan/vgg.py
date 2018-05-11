@@ -73,6 +73,7 @@ def vgg_16(inputs, reuse=False, pooling='avg', final_endpoint='fc8'):
   pooling_fns = {'avg': slim.avg_pool2d, 'max': slim.max_pool2d}
   pooling_fn = pooling_fns[pooling]
 
+  # tf.reset_default_graph()#s
   with tf.variable_scope('vgg_16', [inputs], reuse=reuse) as sc:
     end_points = {}
 

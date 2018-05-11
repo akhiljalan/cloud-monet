@@ -99,6 +99,7 @@ def build_model(content_input_,
         content_input_,
         style_input_,
         stylized_images,
+        reuse=reuse,
         content_weights=content_weights,
         style_weights=style_weights,
         total_variation_weight=total_variation_weight)
