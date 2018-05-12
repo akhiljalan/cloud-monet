@@ -2,11 +2,15 @@
 
 By [Akhil Jalan](https://github.com/akhiljalan/) and [Noah Wu](https://github.com/N0ahW).
 
-## Documents 
+See `cloud_monet_final_paper.pdf` for our final report. 
 
-The **doc/** folder 
+See `cloud_monet_final_poster.pdf` for a high-level overview of our problem. Note that the poster does not contain all of our results, which are in the paper. 
 
 ## Guide to this Repo
+
+The `doc/` folder contains some of the articles that we collected during research. We especially recommend 
+
+The 
 
 This is still a work in progress. We'll give detailed instructions about how to clone the repository and what to look for as we finish it up.
 
