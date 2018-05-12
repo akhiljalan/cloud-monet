@@ -4,6 +4,8 @@ By [Akhil Jalan](https://github.com/akhiljalan/) and [Noah Wu](https://github.co
 
 ## Documents 
 
+The **doc/** folder 
+
 ## Guide to this Repo
 
 This is still a work in progress. We'll give detailed instructions about how to clone the repository and what to look for as we finish it up.
