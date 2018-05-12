@@ -36,3 +36,16 @@ https://www.kaggle.com/c/painter-by-numbers/data
 
 ### Hyperparameters 
 
+| Hyperparameter                              | Value          
+| ------------------------------------------- |:-------------:|
+| Batch Size                                  | 1             |
+| Optimizer (discriminator and generator)     | Adam          |
+| Learning Rate (discriminator and generator) | 1e-2          |
+| Total Variation Weight                      | 1e4           |
+| Total Fooling Weight                        | 2e5           |
+| Content Weight, VGG16, Conv3                | 1             |
+| Style Weights, VGG 16, Conv1                | 5e-4          |
+| Style Weights, VGG 16, Conv2                | 5e-4          |
+| Style Weights, VGG 16, Conv3                | 5e-4          |
+| Style Weights, VGG 16, Conv4                | 5e-4          |
+
