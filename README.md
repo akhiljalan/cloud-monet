@@ -8,11 +8,15 @@ See `cloud_monet_final_poster.pdf` for a high-level overview of our problem. Not
 
 ## Guide to this Repo
 
-The `doc/` folder contains some of the articles that we collected during research. We especially recommend 
+The `doc/` folder contains some of the articles that we collected during research. We especially recommend `doc/Exploring the structure of a real-time, arbitrary neural artistic stylization network.pdf`, which is the source of our baseline model. 
 
-The 
+The `gan/` folder contains the code that we wrote for our GAN model. Here is a schematic of our setup. 
 
-This is still a work in progress. We'll give detailed instructions about how to clone the repository and what to look for as we finish it up.
+![Cycle Schematic](figures/cycle_architecture.png)
+
+The `discriminator/` folder contains deprecated code. To see the discriminator used the final model, see `gan/true_gan.py`. It is a simple CNN, with the following architecture.
+
+![Discriminator](figures/discrim_viz.jpg)
 
 ## Reproducibility
 
